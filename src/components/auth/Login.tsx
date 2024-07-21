@@ -13,7 +13,6 @@ const Login: React.FC = () => {
       return;
     }
 
-    // Clear the error message
     setError('');
 
     // Add your login logic here
@@ -23,7 +22,6 @@ const Login: React.FC = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-4 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center">Login</h2>
         {error && (
           <div className="p-2 text-red-700 bg-red-100 border border-red-400 rounded">
             {error}
@@ -32,7 +30,7 @@ const Login: React.FC = () => {
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
-              className="block mb-2 text-sm font-bold text-gray-700"
+              className="block mb-2 text-lg font-bold text-gray-700 text-start"
               htmlFor="username"
             >
               Username
@@ -48,7 +46,7 @@ const Login: React.FC = () => {
           </div>
           <div className="mb-4">
             <label
-              className="block mb-2 text-sm font-bold text-gray-700"
+              className="block mb-2 text-lg text-start font-bold text-gray-700"
               htmlFor="password"
             >
               Password
@@ -65,7 +63,7 @@ const Login: React.FC = () => {
           <div className="flex items-center justify-between">
             <button
               type="submit"
-              className="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline"
+              className="w-full px-3 py-2 font-bold text-white bg-blue-950 rounded hover:bg-blue-900 focus:outline-none focus:shadow-outline"
             >
               Login
             </button>
