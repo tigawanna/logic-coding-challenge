@@ -22,7 +22,8 @@ const Login: React.FC = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.error || 'Failed to login');
+        console.log(errorData);
+        setError(errorData.message || 'Failed to login');
         return;
       }
 

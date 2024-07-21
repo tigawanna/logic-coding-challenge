@@ -37,7 +37,9 @@ app.post('/login', async (c) => {
     );
 
     if (!res.ok) {
-      return c.json({ message: `Auth Error: ${res.status}` });
+      return c.json({
+        message: "The username and passwordcombination didn't work.Try again.",
+      });
     }
 
     const data = await res.json();
@@ -49,7 +51,6 @@ app.post('/login', async (c) => {
       throw new Error('No token received from the authentication server');
     }
 
-    // Decode the token
     const userData = JSON.stringify(jwt.decode(token), null, 2);
     console.log(userData);
 
