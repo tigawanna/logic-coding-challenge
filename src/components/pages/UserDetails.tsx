@@ -100,9 +100,7 @@ const UserDetailsComponent: React.FC = () => {
         </p>
         <p className="text-start text-lg">
           <span className="text-gray-500 font-semibold mr-2">exp:</span>
-          <span className="text-black">
-            {new Date(userDetails.exp * 1000).toLocaleString()}
-          </span>
+          <span className="text-black">{userDetails.exp}</span>
         </p>
         <p className="text-start text-lg">
           <span className="text-gray-500 font-semibold mr-2">iss:</span>
