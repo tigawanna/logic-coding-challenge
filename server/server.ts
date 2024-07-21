@@ -50,8 +50,8 @@ app.post('/login', async (c) => {
     }
 
     // Decode the token
-    const userData = jwt.decode(token);
-    console.log(`UserData: ${userData}`);
+    const userData = JSON.stringify(jwt.decode(token), null, 2);
+    console.log(userData);
 
     if (!userData) {
       throw new Error('Failed to decode the token');
