@@ -17,32 +17,39 @@ app.get('/', (c) => {
 });
 
 app.post('/login', async (c) => {
-  try {
-    const { username, password } = await c.req.json();
-    console.log('Received login data:', { username, password });
-
-    const response = await fetch(
-      'https://7qscqm2xvu2.us-west-2.awsapprunner.com/v1/auth/login',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-tenantid': 'SchryverPruebas',
-        },
-        body: JSON.stringify({ username, password }),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Server error: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return c.json(data);
-  } catch (error) {
-    console.error('Error during login:', error);
-    return c.json({ error: 'Failed to login. Please try again later.' }, 500);
+  const { username, password } = await c.req.json();
+  console.log(
+    ' ============= hono js ====================== ',
+    username,
+    password
+  );
+  if (username && username === '') {
+    return c.json({ message: 'username required' });
   }
+  if (password && password === '') {
+    return c.json({ message: 'password required' });
+  }
+  const res = await fetch(
+    ' https://7qscqm2xvu2.us-west-2.awsapprunner.com/v1/auth/login',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-tenantid': 'SchryverPruebas',
+      },
+      body: JSON.stringify({
+        username,
+        password,
+      }),
+    }
+  );
+  if (!res.ok) {
+    return c.json({ message: `Auth Error: ${res.status}` });
+  }
+
+  const data = await res.json();
+  c.res.headers.append('Content-Type', 'application/json');
+  return c.json({ message: 'login success', data }, 200);
 });
 
 export default app;
