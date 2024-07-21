@@ -4,8 +4,9 @@ const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [responseData, setResponseData] = useState(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!username || !password) {
@@ -13,10 +14,24 @@ const Login: React.FC = () => {
       return;
     }
 
+    // Clear the error message
     setError('');
 
-    // Add your login logic here
-    console.log('Logging in with', { username, password });
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+      setResponseData(data);
+    } catch (err) {
+      console.error('Error logging in:', err);
+      setError('Login failed');
+    }
   };
 
   return (
@@ -69,6 +84,12 @@ const Login: React.FC = () => {
             </button>
           </div>
         </form>
+        {responseData && (
+          <div className="mt-4">
+            <h3 className="text-lg font-bold">Response Data:</h3>
+            <pre>{JSON.stringify(responseData, null, 2)}</pre>
+          </div>
+        )}
       </div>
     </div>
   );
