@@ -1,17 +1,40 @@
-import { useMutation } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { useMutation,useQueryClient } from "@tanstack/react-query";
+import { createFileRoute,useNavigate } from "@tanstack/react-router";
 import { Loader, Mail, User } from "lucide-react";
 import { useState } from "react";
+import { jwtDecode } from "jwt-decode";
+import { ViewerData } from "../components/types";
+
+
+
+export interface ErrorResponse {
+  message: string;
+}
+export interface SuccessResponse {
+  message: string;
+  data: Data;
+}
+
+export interface Data {
+  access_token: string;
+  token_type: string;
+  expires_in: any;
+}
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
 });
 
 export function LoginPage({}) {
+  const navigate =useNavigate({
+    from: "/login",
+  })
+  const qc = useQueryClient()
   const [input, setInput] = useState({
     username: "OMCOL",
     password: "HEMO+9807",
   });
+
   const mutation = useMutation({
     mutationFn: (data: { username: string; password: string }) => {
       return fetch("/api", {
@@ -30,11 +53,20 @@ export function LoginPage({}) {
         return res.json();
       });
     },
-    onSuccess: (data) => {
+    onSuccess: (data: SuccessResponse) => {
       console.log("========================= login success  ================== ", data);
+      localStorage.removeItem("token");
+      localStorage.setItem("token",JSON.stringify(data.data));
+      qc.setQueryData(["viewer"], {user:jwtDecode(data.data.access_token) }as ViewerData);
+      navigate({
+        to: "/",
+      });
     },
-    onError: (error) => {
+    onError: (error: ErrorResponse) => {
       console.log("========================= login error  ================== ", error);
+      qc.invalidateQueries({
+        queryKey: ["viewer"],
+      });
     },
   });
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -44,6 +76,8 @@ export function LoginPage({}) {
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setInput({ ...input, [e.target.name]: e.target.value });
   }
+  const success_message = mutation.data?.message;
+  const error_message = mutation.error?.message;
   return (
     <div className="w-full h-full min-h-screen flex flex-col items-center gap-2 justify-center">
       <h2 className="text-2xl text-warning">login</h2>
@@ -81,6 +115,14 @@ export function LoginPage({}) {
           Submit {mutation.isPending && <Loader className="h-4 w-4 animate-spin" />}
         </button>
       </form>
+      {success_message && success_message.length > 1 && (
+        <p className=" p-5 border-success rounded-lg bg-success-content text-success">
+          {success_message}
+        </p>
+      )}
+      {error_message && error_message.length > 1 && (
+        <p className="p-5 border-error rounded-lg bg-error-content text-error">{error_message}</p>
+      )}
     </div>
   );
 }

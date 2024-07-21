@@ -5,6 +5,7 @@ import { MutationCache, QueryClient, QueryClientProvider } from "@tanstack/react
 import { routeTree } from "./routeTree.gen";
 import "./index.css";
 import { Spinner } from "./components/Spinner";
+import { useViewer } from "./utils/use-viewer";
 
 export const queryClient = new QueryClient({
   mutationCache: new MutationCache({
@@ -37,7 +38,7 @@ const router = createRouter({
   ),
   defaultErrorComponent: ({ error }) => <ErrorComponent error={error} />,
   context: {
-    auth: undefined!, // We'll inject this when we render
+    viewer: undefined!,
     queryClient,
   },
   defaultPreload: "intent",
@@ -53,6 +54,9 @@ declare module "@tanstack/react-router" {
   }
 }
 function App() {
+  const {query} = useViewer();
+  console.log("========================= viewer ================== ", query);
+  const viewer = query.data
   return (
     <>
       <RouterProvider
@@ -60,6 +64,7 @@ function App() {
         defaultPreload="intent"
         context={{
           queryClient,
+          viewer,
         }}
       />
     </>

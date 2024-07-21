@@ -17,10 +17,10 @@ app.post("/", async (c) => {
   }
 
   if (username && username === "") {
-    return c.json({ message: "username required" });
+    return c.json({ message: "username required" }, 401);
   }
   if (password && password === "") {
-    return c.json({ message: "password required" });
+    return c.json({ message: "password required" },401);
   }
 
   const res = await fetch("https://7qk9m2xvu2.us-west-2.awsapprunner.com/v1/auth/login", {
