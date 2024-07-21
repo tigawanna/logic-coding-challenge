@@ -1,11 +1,11 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, ErrorComponent, createRouter } from "@tanstack/react-router";
-import { MutationCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { routeTree } from "./routeTree.gen";
-import "./index.css";
 import { Spinner } from "./components/Spinner";
+import { routeTree } from "./routeTree.gen";
+import { MutationCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useViewer } from "./utils/use-viewer";
+import "./styles.css";
+import React from "react";
 
 export const queryClient = new QueryClient({
   mutationCache: new MutationCache({
@@ -38,8 +38,8 @@ const router = createRouter({
   ),
   defaultErrorComponent: ({ error }) => <ErrorComponent error={error} />,
   context: {
-    viewer: undefined!,
     queryClient,
+    viewer: undefined,
   },
   defaultPreload: "intent",
   // Since we're using React Query, we don't want loader calls to ever be stale
@@ -47,16 +47,14 @@ const router = createRouter({
   defaultPreloadStaleTime: 0,
 });
 
-// Register the router instance for type safety
 declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
   }
 }
 function App() {
-  const {query} = useViewer();
-  console.log("========================= viewer ================== ", query);
-  const viewer = query.data
+  const { query } = useViewer();
+  const viewer = query.data;
   return (
     <>
       <RouterProvider
@@ -71,10 +69,14 @@ function App() {
   );
 }
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
+const rootElement = document.getElementById("root")!;
+if (!rootElement.innerHTML) {
+  const root = ReactDOM.createRoot(rootElement);
+  root.render(
+    <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <App />
     </QueryClientProvider>
-  </React.StrictMode>
-);
+    </React.StrictMode>
+  );
+}

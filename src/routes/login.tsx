@@ -56,8 +56,16 @@ export function LoginPage({}) {
     onSuccess: (data: SuccessResponse) => {
       console.log("========================= login success  ================== ", data);
       localStorage.removeItem("token");
-      localStorage.setItem("token",JSON.stringify(data.data));
-      qc.setQueryData(["viewer"], {user:jwtDecode(data.data.access_token) }as ViewerData);
+      localStorage.setItem("token", JSON.stringify(data.data));
+      qc.invalidateQueries({ queryKey: ["viewer"] });
+      qc.setQueryData(["viewer"], { user: jwtDecode(data.data.access_token) } as ViewerData)
+      setTimeout(() => {
+        navigate({
+          to: "/",
+        });
+        }, 1000);
+    },
+    onSettled: () => {
       navigate({
         to: "/",
       });
