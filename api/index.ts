@@ -6,6 +6,7 @@ export const config = {
 };
 
 const app = new Hono().basePath("/api");
+app.get("/", (c) => c.text("Hello World"));
 
 app.post("/", async (c) => {
   const { username, password } = await c.req.parseBody<{ username: string; password: string }>();
@@ -17,7 +18,7 @@ app.post("/", async (c) => {
     return c.json({ message: "password required" });
   }
   // change to your endpoint
-  const res = await fetch("https://jsonplaceholder.typicode.com/posts", {
+  const res = await fetch("https://7qk9m2xvu2.us-west-2.awsapprunner.com/v1/auth/login", {
     method: "POST",
     headers: {
       // change to your headers
