@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import jwt from 'jsonwebtoken';
+import { StatusCode } from 'hono/utils/http-status';
 
 const app = new Hono();
 
@@ -17,10 +18,10 @@ app.post('/login', async (c) => {
   const { username, password } = await c.req.json();
 
   if (!username || username.trim() === '') {
-    return c.json({ message: 'Username required' }, 400);
+    return c.json({ message: 'Username required' }, 400 as StatusCode);
   }
   if (!password || password.trim() === '') {
-    return c.json({ message: 'Password required' }, 400);
+    return c.json({ message: 'Password required' }, 400 as StatusCode);
   }
 
   try {
@@ -37,15 +38,15 @@ app.post('/login', async (c) => {
     );
 
     if (!res.ok) {
-      return c.json({
-        message: "The username and passwordcombination didn't work.Try again.",
-      });
+      const errorData = await res.json();
+      return c.json(
+        { message: errorData.message || 'Invalid username or password' },
+        res.status as StatusCode
+      );
     }
 
     const data = await res.json();
     const token = data.access_token;
-
-    console.log(token);
 
     if (!token) {
       throw new Error('No token received from the authentication server');
@@ -58,10 +59,13 @@ app.post('/login', async (c) => {
       throw new Error('Failed to decode the token');
     }
 
-    return c.json({ message: 'Login success', user: userData }, 200);
+    return c.json(
+      { message: 'Login success', user: userData },
+      200 as StatusCode
+    );
   } catch (error) {
     console.log(error.message);
-    return c.json({ message: 'Internal Server Error' }, 500);
+    return c.json({ message: 'Internal Server Error' }, 500 as StatusCode);
   }
 });
 
