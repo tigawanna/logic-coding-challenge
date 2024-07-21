@@ -1,6 +1,16 @@
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 
 const app = new Hono();
+
+app.use(
+  '*',
+  cors({
+    origin: 'http://localhost:5173',
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'Authorization', 'x-tenantid'],
+  })
+);
 
 app.get('/', (c) => {
   return c.json({ message: 'Hello Hono!' });
@@ -9,6 +19,7 @@ app.get('/', (c) => {
 app.post('/login', async (c) => {
   try {
     const { username, password } = await c.req.json();
+    console.log('Received login data:', { username, password });
 
     const response = await fetch(
       'https://7qscqm2xvu2.us-west-2.awsapprunner.com/v1/auth/login',
