@@ -1,7 +1,10 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { jwt } from 'jsonwebtoken';
 
 const app = new Hono();
+
+const JWT_SECRET = 'your-secret-key';
 
 app.use(
   '*',
@@ -12,21 +15,17 @@ app.use(
   })
 );
 
-app.get('/', (c) => {
-  return c.json({ message: 'Hello Hono!' });
-});
-
 app.post('/login', async (c) => {
+  const { username, password } = await c.req.json();
+
+  if (!username || username.trim() === '') {
+    return c.json({ message: 'Username required' }, 400);
+  }
+  if (!password || password.trim() === '') {
+    return c.json({ message: 'Password required' }, 400);
+  }
+
   try {
-    const { username, password } = await c.req.json();
-
-    if (!username || username.trim() === '') {
-      return c.json({ message: 'Username required' }, 400);
-    }
-    if (!password || password.trim() === '') {
-      return c.json({ message: 'Password required' }, 400);
-    }
-
     const res = await fetch(
       'https://7qscqm2xvu2.us-west-2.awsapprunner.com/v1/auth/login',
       {
@@ -35,10 +34,7 @@ app.post('/login', async (c) => {
           'Content-Type': 'application/json',
           'x-tenantid': 'SchryverPruebas',
         },
-        body: JSON.stringify({
-          username,
-          password,
-        }),
+        body: JSON.stringify({ username, password }),
       }
     );
 
@@ -47,10 +43,18 @@ app.post('/login', async (c) => {
     }
 
     const data = await res.json();
-    c.res.headers.append('Content-Type', 'application/json');
-    return c.json({ message: 'Login success', data }, 200);
+    const token = data.token;
+
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(token, JWT_SECRET); // Verify and decode token
+    } catch (err) {
+      return c.json({ message: 'Invalid token' }, 401);
+    }
+
+    return c.json({ message: 'Login success', user: decodedToken }, 200);
   } catch (error) {
-    console.error('Error in /login route:', error);
+    console.log(error.message);
     return c.json({ message: 'Internal Server Error' }, 500);
   }
 });

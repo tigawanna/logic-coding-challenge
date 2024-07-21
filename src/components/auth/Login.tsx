@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -25,6 +27,8 @@ const Login: React.FC = () => {
       }
 
       const data = await response.json();
+      localStorage.setItem('user', data.user);
+      navigate('/second-page');
       console.log('Login successful:', data);
     } catch (error) {
       setError('Failed to login. Please try again later.');
