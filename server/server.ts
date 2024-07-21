@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import jwt from 'jsonwebtoken';
 
 const app = new Hono();
 
@@ -40,16 +41,23 @@ app.post('/login', async (c) => {
     }
 
     const data = await res.json();
-    const token = data.token;
+    const token = data.access_token;
 
-    let decodedToken;
-    try {
-      decodedToken = token;
-    } catch (err) {
-      return c.json({ message: 'Invalid token' }, 401);
+    console.log(token);
+
+    if (!token) {
+      throw new Error('No token received from the authentication server');
     }
 
-    return c.json({ message: 'Login success', user: decodedToken }, 200);
+    // Decode the token
+    const userData = jwt.decode(token);
+    console.log(`UserData: ${userData}`);
+
+    if (!userData) {
+      throw new Error('Failed to decode the token');
+    }
+
+    return c.json({ message: 'Login success', user: userData }, 200);
   } catch (error) {
     console.log(error.message);
     return c.json({ message: 'Internal Server Error' }, 500);
