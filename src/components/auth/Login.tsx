@@ -4,21 +4,13 @@ const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [responseData, setResponseData] = useState(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
-
-    if (!username || !password) {
-      setError('Username and password are required');
-      return;
-    }
-
-    // Clear the error message
     setError('');
 
     try {
-      const response = await fetch('/api/login', {
+      const response = await fetch('/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -26,11 +18,16 @@ const Login: React.FC = () => {
         body: JSON.stringify({ username, password }),
       });
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.error || 'Failed to login');
+        return;
+      }
+
       const data = await response.json();
-      setResponseData(data);
-    } catch (err) {
-      console.error('Error logging in:', err);
-      setError('Login failed');
+      console.log('Login successful:', data);
+    } catch (error) {
+      setError('Failed to login. Please try again later.');
     }
   };
 
@@ -84,12 +81,6 @@ const Login: React.FC = () => {
             </button>
           </div>
         </form>
-        {responseData && (
-          <div className="mt-4">
-            <h3 className="text-lg font-bold">Response Data:</h3>
-            <pre>{JSON.stringify(responseData, null, 2)}</pre>
-          </div>
-        )}
       </div>
     </div>
   );
