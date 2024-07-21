@@ -28,7 +28,7 @@ const Login: React.FC = () => {
 
       const data = await response.json();
       localStorage.setItem('user', data.user);
-      navigate('/second-page');
+      navigate('/user-details');
       console.log('Login successful:', data);
     } catch (error) {
       setError('Failed to login. Please try again later.');

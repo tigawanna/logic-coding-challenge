@@ -1,10 +1,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { jwt } from 'jsonwebtoken';
 
 const app = new Hono();
-
-const JWT_SECRET = 'your-secret-key';
 
 app.use(
   '*',
@@ -27,7 +24,7 @@ app.post('/login', async (c) => {
 
   try {
     const res = await fetch(
-      'https://7qscqm2xvu2.us-west-2.awsapprunner.com/v1/auth/login',
+      'https://7qk9m2xvu2.us-west-2.awsapprunner.com/v1/auth/login',
       {
         method: 'POST',
         headers: {
@@ -47,7 +44,7 @@ app.post('/login', async (c) => {
 
     let decodedToken;
     try {
-      decodedToken = jwt.verify(token, JWT_SECRET); // Verify and decode token
+      decodedToken = token;
     } catch (err) {
       return c.json({ message: 'Invalid token' }, 401);
     }
