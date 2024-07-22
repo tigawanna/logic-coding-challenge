@@ -2,8 +2,11 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import jwt from 'jsonwebtoken';
 import { StatusCode } from 'hono/utils/http-status';
+import { serveStatic } from 'hono/bun';
 
 const app = new Hono();
+
+app.use('*', serveStatic({ root: './dist' }));
 
 app.use(
   '*',
