@@ -1,5 +1,4 @@
 import { Hono } from 'hono';
-import { cors } from 'hono/cors';
 import jwt from 'jsonwebtoken';
 import { StatusCode } from 'hono/utils/http-status';
 import { serveStatic } from 'hono/bun';
@@ -7,15 +6,6 @@ import { serveStatic } from 'hono/bun';
 const app = new Hono();
 
 app.use('*', serveStatic({ root: './dist' }));
-
-app.use(
-  '*',
-  cors({
-    origin: 'http://localhost:5173',
-    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowHeaders: ['Content-Type', 'Authorization', 'x-tenantid'],
-  })
-);
 
 app.post('/login', async (c) => {
   const { username, password } = await c.req.json();
